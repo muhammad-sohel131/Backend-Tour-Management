@@ -58,6 +58,10 @@ const logout = catchAsync(async (req: Request, res: Response, next: NextFunction
 const resetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const decodedToken = req.user
 
+    const newPassword = req.body.newPassword
+    const oldPassword = req.body.oldPassword
+    await AuthServices.resetPassword(oldPassword, newPassword, decodedToken)
+
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
