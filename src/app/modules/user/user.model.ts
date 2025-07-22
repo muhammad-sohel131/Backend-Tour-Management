@@ -27,8 +27,7 @@ const userSchema = new Schema<IUser>({
         unique: true
     },
     password: {
-        type: String,
-        required: true
+        type: String
     },
     role: {
         type: String,
@@ -57,7 +56,7 @@ const userSchema = new Schema<IUser>({
         type: Boolean,
         default: false
     },
-    auth: [authProviderSchema]
+    auths: [authProviderSchema]
 }, {
     timestamps: true,
     versionKey: false

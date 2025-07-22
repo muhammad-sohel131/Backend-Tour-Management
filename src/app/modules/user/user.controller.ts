@@ -13,6 +13,7 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const user = await UserServices.createUser(req.body)
+
   sendResponse<IUser>(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -22,11 +23,11 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 })
 
 const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.params.userId;
+  const userId = req.params.id;
   const verifiedToken = req.user
   const payload = req.body
   
-  const user = await UserServices.updateUser(userId, payload, verifiedToken) as IUser
+  const user = await UserServices.updateUser(userId, payload, verifiedToken as JwtPayload) as IUser
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.CREATED,
