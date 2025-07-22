@@ -2,7 +2,11 @@
 import { NextFunction, Request, Response } from "express";
 import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
-
+import { handleCastError } from "../helpers/handleCastError";
+import { handleDuplicateError } from "../helpers/handleDuplicateError";
+import { handleValidationError } from "../helpers/handleValidationError";
+import { handleZodError } from "../helpers/handleZodError";
+import { IErrorSources } from "../interfaces/error.types";
 
 export const globalErrorHandle = (
   err: any,
@@ -11,39 +15,43 @@ export const globalErrorHandle = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ) => {
+  if(envVars.NODE_ENV === 'development'){
+    console.log(err)
+  }
+  
   let statusCode = 500;
   let message = `Something wen wrong!! ${err.message}`;
-   const errorsSource: any = []
+  let errorsSource: IErrorSources[] = [];
 
   // duplicate error
   if (err.code === 11000) {
-    statusCode = 400;
-    message = `${req.body.email} is already exist`;
+    const simplifiedError = handleDuplicateError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
 
     // Object Id / mongoose id
-  } else if(err.name === 'CastError'){
-    statusCode = 400
-    message = 'Invalid MongoDB Object Id'
+  } else if (err.name === "CastError") {
+    const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
 
     // Zod Validation Error
-  }else if(err.name === 'ZodError'){
-    message = "Zod Error"
-    statusCode = 400
+  } else if (err.name === "ZodError") {
+    const simplifiedError = handleZodError(err)
 
-    console.log(err)
+    message = simplifiedError.message;
+    statusCode = simplifiedError.statusCode;
+    errorsSource = simplifiedError.errorSources as IErrorSources[]
 
     // mongoose validation error
-  }else if(err.name == 'ValidationError'){
-    statusCode= 400
-    const errors = Object.values(err.errors)
+  } else if (err.name == "ValidationError") {
+    const simplifiedError = handleValidationError(err)
+    message = simplifiedError.message
+    statusCode = simplifiedError.statusCode
+    errorsSource = simplifiedError.errorSources as IErrorSources[]
 
-    errors.forEach((errorObject: any) => errorsSource.push({
-      path: errorObject.path,
-      message: errorObject.message
-    }))
-    
-    message = "Validation Error"
-  }else if (err instanceof AppError) {
+
+  } else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
   } else if (err instanceof Error) {
@@ -55,7 +63,7 @@ export const globalErrorHandle = (
     success: false,
     message,
     errorsSource,
-    err,
+    err: envVars.NODE_ENV === 'development' ? err : null,
     stack: envVars.NODE_ENV === "development" ? err.stack : null,
   });
 };
