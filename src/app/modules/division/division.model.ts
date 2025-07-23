@@ -21,4 +21,4 @@ const divisionSchema = new Schema<IDivision>({
     timestamps: true
 })
 
-export const DivisionModel = model<IDivision>('Division', divisionSchema)
+export const Division = model<IDivision>('Division', divisionSchema)

@@ -12,6 +12,7 @@ const updateUser = async (
   decodedToken: JwtPayload
 ) => {
   const isUserExist = await User.findById(userId);
+  
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
   }
