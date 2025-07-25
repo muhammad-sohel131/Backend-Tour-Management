@@ -18,4 +18,11 @@ router.post(
 router.patch('/tour-types/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN) ,tourControllers.updateTourType)
 router.delete('/tour-types/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), tourControllers.deleteTourType)
 
+
+// routes for Tour
+router.get('/', tourControllers.getAllTour)
+router.post('/create', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), tourControllers.createTour)
+router.patch('/:id',checkAuth(Role.ADMIN, Role.SUPER_ADMIN), tourControllers.updateTour)
+router.delete('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), tourControllers.deleteTour)
+
 export const tourRoutes = router;

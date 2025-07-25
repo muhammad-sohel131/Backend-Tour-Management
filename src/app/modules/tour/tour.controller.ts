@@ -3,7 +3,7 @@ import { catchAsync } from "../../utils/catchAsync"
 import { sendResponse } from "../../utils/sendResponse"
 import httpStatus from 'http-status-codes'
 import { tourServices } from "./tour.service"
-import { ITourType } from "./tour.interface"
+import { ITour, ITourType } from "./tour.interface"
 
 const getAllTourTypes = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
     const tourTypes = await tourServices.getAllTourTypes()
@@ -50,9 +50,60 @@ const deleteTourType = catchAsync(async(req: Request, res: Response, next: NextF
         data: deletedTourType
     })
 })
+
+// Tour Controllers -----------------------------------
+const createTour = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
+    const createdTour = await tourServices.createTour(req.body)
+
+    sendResponse<ITour>(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Tour is created.",
+        data: createdTour
+    })
+})
+
+const getAllTour = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
+    const tours = await tourServices.getAllTour()
+
+    sendResponse<ITour[]>(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "All Tours are fetched.",
+        data: tours.data,
+        meta: tours.meta
+    })
+})
+
+const updateTour = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
+    const tourId = req.params.id
+    const updatedTour = await tourServices.updateTour(tourId, req.body)
+
+    sendResponse(res, {
+        success: true,
+        message: "Tour is Updated Successfully.",
+        statusCode: httpStatus.OK,
+        data: updatedTour,
+    })
+})
+
+const deleteTour = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
+    const deletedTour = await tourServices.deleteTour(req.params.id)
+
+    sendResponse<ITour>(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "The tour is Deleted Successfully.",
+        data: deletedTour
+    })
+})
 export const tourControllers = {
     getAllTourTypes,
     createTourType,
     updateTourType,
-    deleteTourType
+    deleteTourType,
+    getAllTour,
+    createTour,
+    updateTour,
+    deleteTour
 }

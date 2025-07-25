@@ -10,10 +10,6 @@ const createDivision = async (payload: Partial<IDivision>) => {
   if (isNameExist) {
     throw new AppError(httpStatus.BAD_REQUEST, "Use Unique Name");
   }
-
-  const baseSlug = name?.split(" ").join("-").concat("-division").toLowerCase();
-  payload.slug = baseSlug;
-
   const division = await Division.create(payload);
 
   return division;
@@ -51,14 +47,6 @@ const updateDivision = async (
       "Division Name is Already Exist"
     );
   }
-
-  const baseSlug = payload.name
-    ?.split(" ")
-    .join("-")
-    .concat("-division")
-    .toLowerCase();
-
-  payload.slug = baseSlug;
 
   const updatedDivision = await Division.findByIdAndUpdate(
     divisionId,

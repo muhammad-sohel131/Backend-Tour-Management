@@ -1,81 +1,103 @@
-import { model, Schema} from "mongoose";
+import { model, Schema } from "mongoose";
 import { ITour, ITourType } from "./tour.interface";
 
-const tourTypeSchema = new Schema<ITourType>({
+const tourTypeSchema = new Schema<ITourType>(
+  {
     name: {
-        type: String,
-        unique: true,
-        required: true
-    }
-},{
-    timestamps: true
-})
+      type: String,
+      unique: true,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export const TourType = model<ITourType>('TourType', tourTypeSchema)
+export const TourType = model<ITourType>("TourType", tourTypeSchema);
 
-const tourSchema = new Schema<ITour>({
+const tourSchema = new Schema<ITour>(
+  {
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     slug: {
-        type: String,
-        required: true,
-        unique: true
+      type: String,
+      unique: true,
     },
     description: {
-        type: String
+      type: String,
     },
     images: {
-        type: [String],
-        default: []
+      type: [String],
+      default: [],
     },
     location: {
-        type: String
+      type: String,
     },
     costFrom: {
-        type: Number
+      type: Number,
     },
     startDate: {
-        type: Date
+      type: Date,
     },
     endDate: {
-        type: Date
+      type: Date,
     },
     included: {
-        type: [String],
-        default: []
+      type: [String],
+      default: [],
     },
     excluded: {
-        type: [String],
-        default: []
+      type: [String],
+      default: [],
     },
     amenities: {
-        type: [String],
-        default: []
+      type: [String],
+      default: [],
     },
     tourPlane: {
-        type: [String],
-        default: []
+      type: [String],
+      default: [],
     },
     maxGuest: {
-        type: Number
+      type: Number,
     },
     minAge: {
-        type: Number
+      type: Number,
     },
     division: {
-        type: Schema.Types.ObjectId,
-        ref: 'Division',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: "Division",
+      required: true,
     },
     tourType: {
-        type: Schema.Types.ObjectId,
-        ref: 'TourType',
-        required: true
-    }
-},{
-    timestamps: true
-})
+      type: Schema.Types.ObjectId,
+      ref: "TourType",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export const Tour = model<ITour>('Tour', tourSchema)
+tourSchema.pre("save", function (next) {
+  if (this.isModified("title")) {
+    const baseSlug = this.title?.split(" ").join("-").toLowerCase();
+    this.slug = baseSlug;
+  }
+  next();
+});
+tourSchema.pre("findOneAndUpdate", async function (next) {
+  const tour = this.getUpdate() as Partial<ITour>;
+
+  if (tour.title) {
+    const baseSlug = tour.title?.split(" ").join("-").toLowerCase();
+    tour.slug = baseSlug;
+  }
+  this.setUpdate(tour);
+  next();
+});
+export const Tour = model<ITour>("Tour", tourSchema);
