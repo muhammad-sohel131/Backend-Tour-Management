@@ -1,4 +1,5 @@
 import AppError from "../../errorHelpers/AppError";
+import { excludedField, tourSearchField } from "./tour.const";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 import httpStatus from "http-status-codes";
@@ -62,9 +63,28 @@ const createTour = async (payload: Partial<ITour>) => {
   return createdTour;
 };
 
-const getAllTour = async () => {
-  const tours = await Tour.find();
-  const totalTours = await Tour.countDocuments();
+const getAllTour = async (query: Record<string, string>) => {
+  const filter = query;
+  const searchTerm = query.searchTerm || "";
+  const sort = query.sort || "-createdAt";
+  const fields = query.fields?.split(",").join(" ") || "";
+
+  for (const field of excludedField) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete filter[field];
+  }
+
+  const searchQuery = {
+    $or: tourSearchField.map((filed) => ({
+      [filed]: { $regex: searchTerm, $options: "i" },
+    })),
+  };
+  const tours = await Tour.find(searchQuery)
+    .find(filter)
+    .sort(sort)
+    .select(fields);
+    
+  const totalTours = tours.length;
 
   return {
     data: tours,

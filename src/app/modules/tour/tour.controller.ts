@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express"
 import { catchAsync } from "../../utils/catchAsync"
 import { sendResponse } from "../../utils/sendResponse"
@@ -64,7 +65,7 @@ const createTour = catchAsync(async(req: Request, res: Response, next: NextFunct
 })
 
 const getAllTour = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
-    const tours = await tourServices.getAllTour()
+    const tours = await tourServices.getAllTour(req.query as Record<string, string>)
 
     sendResponse<ITour[]>(res, {
         statusCode: httpStatus.OK,
