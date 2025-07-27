@@ -26,7 +26,7 @@ export const seedSuperAdmin = async () => {
             email: envVars.SUPER_ADMIN_EMAIL,
             password: hashedPassword,
             isVerified: true,
-            auth: [authProvider]
+            auths: [authProvider]
         }
 
         const superAdmin = await User.create(payload)

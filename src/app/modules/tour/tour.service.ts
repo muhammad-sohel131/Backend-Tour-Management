@@ -1,5 +1,6 @@
 import AppError from "../../errorHelpers/AppError";
-import { excludedField, tourSearchField } from "./tour.const";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { tourSearchField } from "./tour.const";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 import httpStatus from "http-status-codes";
@@ -63,34 +64,65 @@ const createTour = async (payload: Partial<ITour>) => {
   return createdTour;
 };
 
+// const getAllTour = async (query: Record<string, string>) => {
+//   const filter = query;
+//   const searchTerm = query.searchTerm || "";
+//   const sort = query.sort || "-createdAt";
+//   const fields = query.fields?.split(",").join(" ") || "";
+
+//   const page = Number(query.page) || 1
+//   const limit = Number(query.limit) || 10
+//   const skip = (page - 1) * limit
+
+//   for (const field of excludedField) {
+//     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+//     delete filter[field];
+//   }
+
+//   const searchQuery = {
+//     $or: tourSearchField.map((filed) => ({
+//       [filed]: { $regex: searchTerm, $options: "i" },
+//     })),
+//   };
+//   const tours = await Tour.find(searchQuery)
+//     .find(filter)
+//     .sort(sort)
+//     .select(fields)
+//     .skip(skip)
+//     .limit(limit)
+
+//   const totalTours = await Tour.countDocuments();
+//   const totalPage = Math.ceil(totalTours / limit)
+
+//   return {
+//     data: tours,
+//     meta: {
+//       page: page,
+//       limit: limit,
+//       total: totalTours,
+//       totalPage
+//     },
+//   };
+// };
+
 const getAllTour = async (query: Record<string, string>) => {
-  const filter = query;
-  const searchTerm = query.searchTerm || "";
-  const sort = query.sort || "-createdAt";
-  const fields = query.fields?.split(",").join(" ") || "";
+  const tourBuilders = new QueryBuilder(Tour.find(), query);
 
-  for (const field of excludedField) {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete filter[field];
-  }
+  const tours = await tourBuilders
+    .search(tourSearchField)
+    .filter()
+    .sort()
+    .fields()
+    .paginate()
+    .build();
+  // const totalTours = await Tour.countDocuments();
 
-  const searchQuery = {
-    $or: tourSearchField.map((filed) => ({
-      [filed]: { $regex: searchTerm, $options: "i" },
-    })),
-  };
-  const tours = await Tour.find(searchQuery)
-    .find(filter)
-    .sort(sort)
-    .select(fields);
-    
-  const totalTours = tours.length;
+  const meta = await tourBuilders.getMeta()
 
+  
   return {
     data: tours,
-    meta: {
-      total: totalTours,
-    },
+    meta
   };
 };
 

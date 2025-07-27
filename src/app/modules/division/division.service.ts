@@ -27,6 +27,12 @@ const getAllDivision = async () => {
   };
 };
 
+const getSingleDivision = async (slug: string) => {
+
+  const data = await Division.findOne({slug})
+
+  return data
+}
 const updateDivision = async (
   divisionId: string,
   payload: Partial<IDivision>
@@ -68,4 +74,5 @@ export const divisionService = {
   createDivision,
   updateDivision,
   deleteDivision,
+  getSingleDivision
 };

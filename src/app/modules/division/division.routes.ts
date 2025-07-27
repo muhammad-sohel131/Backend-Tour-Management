@@ -16,6 +16,7 @@ router.post(
   divisionController.createDivision,
   validateRequest(createDivisionZodSchema)
 );
+router.get('/:slug', divisionController.getSingleDivision)
 
 router.patch(
   "/:id",

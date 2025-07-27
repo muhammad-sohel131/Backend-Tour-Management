@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { ITour, ITourType } from "./tour.interface";
+import { string } from "zod";
 
 const tourTypeSchema = new Schema<ITourType>(
   {
@@ -44,6 +45,12 @@ const tourSchema = new Schema<ITour>(
     },
     endDate: {
       type: Date,
+    },
+    arrivalLocation: {
+      type: String,
+    },
+    departureLocation: {
+      type: string,
     },
     included: {
       type: [String],
