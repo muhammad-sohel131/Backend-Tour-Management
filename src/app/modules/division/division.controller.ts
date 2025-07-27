@@ -21,6 +21,21 @@ const getDivision = catchAsync(
   }
 );
 
+const getSingleDivision = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const slug = req.params.slug
+    
+    const data = await divisionService.getSingleDivision(slug)
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Retrieved Successfully",
+      data,
+    });
+  }
+);
+
 const createDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const division = await divisionService.createDivision(req.body);
@@ -34,32 +49,38 @@ const createDivision = catchAsync(
   }
 );
 
-const updateDivision = catchAsync(async(req: Request, res: Response) => {
-    const userId = req.params.id
-    const updatedDivision = await divisionService.updateDivision(userId, req.body)
+const updateDivision = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const updatedDivision = await divisionService.updateDivision(
+    userId,
+    req.body
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Division Updated Successfully",
+    data: updatedDivision,
+  });
+});
+
+const deleteDivision = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    const deletedDivision = await divisionService.deleteDivision(userId);
 
     sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: 'Division Updated Successfully',
-        data: updatedDivision
-    })
-})
-
-const deleteDivision = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
-    const userId = req.params.id
-    const deletedDivision = await divisionService.deleteDivision(userId)
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Division is Deleted!",
-        data: deletedDivision
-    })
-})
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Division is Deleted!",
+      data: deletedDivision,
+    });
+  }
+);
 export const divisionController = {
   getDivision,
   createDivision,
   updateDivision,
-  deleteDivision
+  deleteDivision,
+  getSingleDivision
 };

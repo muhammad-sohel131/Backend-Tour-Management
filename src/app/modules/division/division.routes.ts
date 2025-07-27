@@ -16,6 +16,7 @@ router.post(
   divisionController.createDivision,
   validateRequest(createDivisionZodSchema)
 );
+router.get('/:slug', divisionController.getSingleDivision)
 
 router.patch(
   "/:id",
@@ -24,6 +25,10 @@ router.patch(
   divisionController.updateDivision
 );
 
-router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), divisionController.deleteDivision)
+router.delete(
+  "/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  divisionController.deleteDivision
+);
 
 export const divisionRoutes = router;
