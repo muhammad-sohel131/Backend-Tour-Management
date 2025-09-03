@@ -32,6 +32,11 @@ interface EnvConfig {
     SSL_FAIL_FRONTEND_URL: string;
     SSL_CANCEL_FRONTEND_URL: string;
   };
+  CLOUDINARY: {
+      CLOUD_NAME: string
+      API_KEY: string
+      API_SECRET: string
+    }
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -60,7 +65,10 @@ const loadEnvVariables = (): EnvConfig => {
     "SSL_FAIL_BACKEND_URL",
     "SSL_FAIL_FRONTEND_URL",
     "SSL_CANCEL_BACKEND_URL",
-    "SSL_FAIL_FRONTEND_URL"
+    "SSL_FAIL_FRONTEND_URL",
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET"
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -100,6 +108,13 @@ const loadEnvVariables = (): EnvConfig => {
       SSL_FAIL_FRONTEND_URL: process.env.SSL_FAIL_FRONTEND_URL as string,
       SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL as string
     },
+
+    // cloudinary
+    CLOUDINARY: {
+      API_KEY: process.env.CLOUDINARY_API_KEY as string,
+      API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+      CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string
+    }
   };
 };
 export const envVars: EnvConfig = loadEnvVariables();
