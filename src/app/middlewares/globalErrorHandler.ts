@@ -7,8 +7,9 @@ import { handleDuplicateError } from "../helpers/handleDuplicateError";
 import { handleValidationError } from "../helpers/handleValidationError";
 import { handleZodError } from "../helpers/handleZodError";
 import { IErrorSources } from "../interfaces/error.types";
+import { deleteImageFromCloudinary } from "../config/cloudinary.config";
 
-export const globalErrorHandle = (
+export const globalErrorHandle = async(
   err: any,
   req: Request,
   res: Response,
@@ -22,6 +23,15 @@ export const globalErrorHandle = (
   let statusCode = 500;
   let message = `Something wen wrong!! ${err.message}`;
   let errorsSource: IErrorSources[] = [];
+
+  if(req.file){
+    await deleteImageFromCloudinary(req.file.path)
+  }
+
+  if(req.files && req.files.length){
+    const images = (req.files as Express.Multer.File[]).map(file => file.path)
+    await Promise.all(images.map(url => deleteImageFromCloudinary(url)))
+  }
 
   // duplicate error
   if (err.code === 11000) {

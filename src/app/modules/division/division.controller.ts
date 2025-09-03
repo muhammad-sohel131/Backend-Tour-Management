@@ -38,7 +38,12 @@ const getSingleDivision = catchAsync(
 
 const createDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const division = await divisionService.createDivision(req.body);
+
+    const payload: IDivision = {
+      ...req.body,
+      thumbnail: req.file?.path
+    }
+    const division = await divisionService.createDivision(payload);
 
     sendResponse<IDivision>(res, {
       statusCode: httpStatus.CREATED,
