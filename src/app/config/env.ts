@@ -33,10 +33,17 @@ interface EnvConfig {
     SSL_CANCEL_FRONTEND_URL: string;
   };
   CLOUDINARY: {
-      CLOUD_NAME: string
-      API_KEY: string
-      API_SECRET: string
-    }
+    CLOUD_NAME: string;
+    API_KEY: string;
+    API_SECRET: string;
+  };
+  EMAIL_SENDER: {
+    SMTP_PASS: string;
+    SMTP_HOST: string;
+    SMTP_PORT: string;
+    SMTP_USER: string;
+    SMTP_FROM: string;
+  };
 }
 
 const loadEnvVariables = (): EnvConfig => {
@@ -68,7 +75,12 @@ const loadEnvVariables = (): EnvConfig => {
     "SSL_FAIL_FRONTEND_URL",
     "CLOUDINARY_CLOUD_NAME",
     "CLOUDINARY_API_KEY",
-    "CLOUDINARY_API_SECRET"
+    "CLOUDINARY_API_SECRET",
+    "SMTP_FROM",
+    "SMTP_USER",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_PASS",
   ];
 
   requiredEnvVariables.forEach((key) => {
@@ -106,15 +118,23 @@ const loadEnvVariables = (): EnvConfig => {
 
       SSL_SUCCESS_FRONTEND_URL: process.env.SSL_SUCCESS_FRONTEND_URL as string,
       SSL_FAIL_FRONTEND_URL: process.env.SSL_FAIL_FRONTEND_URL as string,
-      SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL as string
+      SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL as string,
     },
 
     // cloudinary
     CLOUDINARY: {
       API_KEY: process.env.CLOUDINARY_API_KEY as string,
       API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
-      CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string
-    }
+      CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+    },
+
+    EMAIL_SENDER: {
+      SMTP_FROM: process.env.SMTP_FROM as string,
+      SMTP_USER: process.env.SMTP_USER as string,
+      SMTP_HOST: process.env.SMTP_HOST as string,
+      SMTP_PASS: process.env.SMTP_PASS as string,
+      SMTP_PORT: process.env.SMTP_PORT as string,
+    },
   };
 };
 export const envVars: EnvConfig = loadEnvVariables();
