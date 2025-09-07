@@ -10,6 +10,11 @@ import { generatePdf, IInvoiceData } from "../../utils/invoice";
 import { IUser } from "../user/user.interface";
 import { ITour } from "../tour/tour.interface";
 import { sendEmail } from "../../utils/sendEmail";
+import { uploadBufferToCloudinary } from "../../config/cloudinary.config";
+
+interface ICloudinaryResult {
+  secure_url: string;
+}
 
 const initPayment = async (bookingId: string) => {
   const payment = await Payment.findOne({ booking: bookingId });
@@ -39,7 +44,6 @@ const initPayment = async (bookingId: string) => {
 const successPayment = async (query: Record<string, string>) => {
   const session = await Booking.startSession();
   session.startTransaction();
-
   try {
     const updatedPayment = await Payment.findOneAndUpdate(
       {
@@ -67,8 +71,9 @@ const successPayment = async (query: Record<string, string>) => {
       }
     )
       .populate("tour", "title")
-      .populate("user", "name", "email");
+      .populate("user", "name email");
 
+      
     const invoiceData: IInvoiceData = {
       username: (updatedBooking?.user as IUser).name,
       bookingDate: updatedBooking?.createdAt as Date,
@@ -78,7 +83,20 @@ const successPayment = async (query: Record<string, string>) => {
       transactionId: updatedPayment?.transactionId as string,
     };
 
-    const pdfBuffer = await generatePdf(invoiceData)
+    const pdfBuffer = await generatePdf(invoiceData);
+
+    console.log("c")
+    const cloudinaryResult: ICloudinaryResult = (await uploadBufferToCloudinary(
+      pdfBuffer,
+      "invoice"
+    )) as ICloudinaryResult;
+
+    await Payment.findByIdAndUpdate(updatedPayment?._id, {
+      invoiceUrl: cloudinaryResult.secure_url,
+    }, {
+      runValidators: true, session
+    });
+
     await sendEmail({
       to: (updatedBooking?.user as IUser).email,
       subject: "Your Booking Invoice",
@@ -88,10 +106,10 @@ const successPayment = async (query: Record<string, string>) => {
         {
           filename: "invoice.pdf",
           content: pdfBuffer,
-          contentType: "application/pdf"
-        }
-      ]
-    })
+          contentType: "application/pdf",
+        },
+      ],
+    });
     await session.commitTransaction();
     session.endSession();
 
@@ -191,11 +209,23 @@ const cancelPayment = async (query: Record<string, string>) => {
     console.log(error);
     await session.commitTransaction();
     session.endSession();
+     throw new AppError(401, "Something wrong to make cancel")
   }
 };
+
+const getInvoice = async(paymentId: string) => {
+  const payment = await Payment.findById(paymentId).select("invoiceUrl").orFail(new Error("Payment not found."))
+
+  if(!payment.invoiceUrl){
+    throw new AppError(401, "Invoice not available yet.")
+  }
+
+  return payment.invoiceUrl
+}
 export const PaymentServices = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
+  getInvoice
 };
