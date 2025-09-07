@@ -75,7 +75,7 @@ const successPayment = async (query: Record<string, string>) => {
 
       
     const invoiceData: IInvoiceData = {
-      username: (updatedBooking?.user as IUser).name,
+      userName: (updatedBooking?.user as unknown as IUser).name,
       bookingDate: updatedBooking?.createdAt as Date,
       guestCount: updatedBooking?.guestCount as number,
       tourTitle: (updatedBooking?.tour as ITour).title,
@@ -84,8 +84,6 @@ const successPayment = async (query: Record<string, string>) => {
     };
 
     const pdfBuffer = await generatePdf(invoiceData);
-
-    console.log("c")
     const cloudinaryResult: ICloudinaryResult = (await uploadBufferToCloudinary(
       pdfBuffer,
       "invoice"
