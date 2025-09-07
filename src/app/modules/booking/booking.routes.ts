@@ -13,7 +13,7 @@ const router = Router();
 router.post(
   "/",
   validateRequest(createBookingZodSchema),
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  checkAuth(...Object.values(Role)),
   BookingController.createBooking
 );
 router.get(
