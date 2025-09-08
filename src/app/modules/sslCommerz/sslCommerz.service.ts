@@ -56,7 +56,6 @@ const sslPaymentInit = async (payload: IsslCommerz) => {
     });
 
     return response.data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log("Payment Error Occurred", error);
     throw new AppError(httpStatus.BAD_REQUEST, error.message);
