@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { PaymentServices } from "./payment.service";
 import { sendResponse } from "../../utils/sendResponse";
+import { sslService } from "../sslCommerz/sslCommerz.service";
 
 const initPayment = catchAsync(async (req: Request, res: Response) => {
   const bookingId = req.params.bookingId;
@@ -20,7 +21,7 @@ const successPayment = catchAsync(async (req: Request, res: Response) => {
     req.query as Record<string, string>
   );
 
-  console.log(result)
+  console.log(result);
   if (result?.success) {
     res.redirect(
       `envVars.SSL.SSL_SUCCESS_FRONTEND_URL?transactionId=${req.query.transaction}&message=${result.message}&amount=${req.query.amount}&status=success`
@@ -84,10 +85,21 @@ const getInvoice = catchAsync(async (req: Request, res: Response) => {
     data: url,
   });
 });
+
+const validatePayment = catchAsync(async (req: Request, res: Response) => {
+  await sslService.validatePayment(req.body);
+  sendResponse(res, {
+    success: true,
+    message: "Payment Validated Successfully.",
+    statusCode: 200,
+    data: null,
+  });
+});
 export const PaymentController = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
   getInvoice,
+  validatePayment,
 };
