@@ -57,14 +57,13 @@ const updateUser = catchAsync(
 
 const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { data, meta } = await UserServices.getAllUsers();
+    const { data } = await UserServices.getAllUsers();
 
     sendResponse<IUser[]>(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "All Users Retrieved Successfully",
-      data,
-      meta,
+      data
     });
   }
 );

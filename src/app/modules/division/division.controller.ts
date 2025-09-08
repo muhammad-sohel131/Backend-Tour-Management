@@ -9,14 +9,13 @@ import { JwtPayload } from "jsonwebtoken";
 
 const getDivision = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { data, meta } = await divisionService.getAllDivision();
+    const { data } = await divisionService.getAllDivision();
 
-    sendResponse<IDivision[]>(res, {
+    sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "All Users Retrieved Successfully",
       data,
-      meta,
     });
   }
 );

@@ -14,20 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
+const env_1 = require("./app/config/env");
+const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
+const redis_config_1 = require("./app/config/redis.config");
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect("mongodb+srv://tour:tour131@cluster0.jd7el.mongodb.net/tour-management?retryWrites=true&w=majority&appName=Cluster0");
+        yield mongoose_1.default.connect(env_1.envVars.DB_URL);
         console.log("Connected to DB");
-        server = app_1.default.listen(5000, () => {
-            console.log("Server is listening to port 5000");
+        server = app_1.default.listen(env_1.envVars.PORT, () => {
+            console.log(`Server is listening to port ${env_1.envVars.PORT}`);
         });
     }
     catch (error) {
         console.log(error);
     }
 });
-startServer();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, redis_config_1.connectRedis)();
+    yield startServer();
+    yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+}))();
 process.on("unhandledRejection", (err) => {
     console.log("unhandledRejection detected... Server shutting down...", err);
     if (server) {
@@ -46,8 +53,7 @@ process.on("uncaughtException", (err) => {
     }
     process.exit(1);
 });
-const ok;
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
     console.log("SIGTERM signal received... Server shutting down...");
     if (server) {
         server.close(() => {
