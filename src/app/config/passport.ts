@@ -119,8 +119,7 @@ passport.use(
             ],
           });
         }
-
-        return done(null, isUserExist);
+        done(null, isUserExist);
       } catch (error) {
         console.log("Google Strategy Error", error);
         return done(error);
